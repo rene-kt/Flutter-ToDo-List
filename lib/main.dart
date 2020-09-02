@@ -16,12 +16,26 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  List _toDoList = ['Renê', 'Ludy'];
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("To-Do List"),
+          backgroundColor: Colors.lightBlueAccent,
+          centerTitle: true,
+        ),
+        body: ListView.builder(
+          itemCount: _toDoList.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(_toDoList[index]),
+            );
+          },
+        ));
 
     // ignore: dead_code
-    List _toDoList = [];
 
     Future<File> _getFile() async {
       final directory = await getApplicationDocumentsDirectory();
