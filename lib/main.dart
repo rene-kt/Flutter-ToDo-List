@@ -29,8 +29,13 @@ class _HomeState extends State<Home> {
         body: ListView.builder(
           itemCount: _toDoList.length,
           itemBuilder: (context, index) {
-            return ListTile(
+            return CheckboxListTile(
               title: Text(_toDoList[index]),
+              value: _toDoList[index]["ok"],
+              secondary: CircleAvatar(
+                child: Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
+              ),
+              onChanged: (bool value) {},
             );
           },
         ));
