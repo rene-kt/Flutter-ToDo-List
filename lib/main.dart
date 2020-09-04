@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:FlutterToDoList/data/manipulating-data.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -16,7 +17,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List _toDoList = [];
   final _formKey = GlobalKey<FormState>();
   TextEditingController titleController = TextEditingController();
   TextEditingController descController = TextEditingController();
@@ -24,118 +24,94 @@ class _HomeState extends State<Home> {
 
   DateTime _dateTime;
 
+  List toDoList = ManipulatingData.toDoList;
   var format = new DateFormat("dd/MM/yyyy");
-
-  void _addToDo() {
-    setState(() {
-      Map<String, dynamic> newToDo = Map();
-      newToDo["title"] = titleController.text;
-      newToDo["desc"] = descController.text;
-      newToDo["date"] = dateController.text;
-      newToDo["ok"] = false;
-      _toDoList.add(newToDo);
-    });
-  }
-
-  Future<File> _getFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File("${directory.path}/data.json");
-  }
-
-  Future<File> _saveData() async {
-    String data = json.encode(_toDoList);
-    final file = await _getFile();
-    return file.writeAsString(data);
-  }
-
-  Future<String> _readData() async {
-    try {
-      final file = await _getFile();
-
-      return file.readAsString();
-    } catch (e) {
-      return "erro: " + e;
-    }
-  }
 
   _createAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
+          return SimpleDialog(
               elevation: 15.0,
               title: Text("Name your task"),
-              content: Form(
-                  key: _formKey,
-                  child: Container(
-                      height: 250.0,
-                      child: Center(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                            TextFormField(
-                              controller: titleController,
-                              decoration: const InputDecoration(
-                                hintText: 'Type the title',
+              children: <Widget>[
+                Form(
+                    key: _formKey,
+                    child: Container(
+                        height: 250.0,
+                        child: Center(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                              TextFormField(
+                                controller: titleController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Type the title',
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return "Please, enter some text";
+                                  } else {
+                                    return null;
+                                  }
+                                },
                               ),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return "Please, enter some text";
-                                } else {
-                                  return null;
-                                }
-                              },
-                            ),
-                            TextFormField(
-                              controller: descController,
-                              decoration: const InputDecoration(
-                                hintText: 'Type the description',
+                              TextFormField(
+                                controller: descController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Type the description',
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return "Please, enter some text";
+                                  } else {
+                                    return null;
+                                  }
+                                },
                               ),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return "Please, enter some text";
-                                } else {
-                                  return null;
-                                }
-                              },
-                            ),
-                            TextFormField(
-                              controller: dateController,
-                              onTap: () {
-                                showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime.now(),
-                                        lastDate: DateTime(2022))
-                                    .then((date) {
-                                  setState(() {
-                                    _dateTime = date;
-                                    dateController.text = format.format(date);
+                              TextFormField(
+                                controller: dateController,
+                                onTap: () {
+                                  showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime.now(),
+                                          lastDate: DateTime(2022))
+                                      .then((date) {
+                                    setState(() {
+                                      _dateTime = date;
+                                      dateController.text = format.format(date);
+                                    });
                                   });
-                                });
-                              },
-                              decoration: InputDecoration(
-                                  hintText: 'Select the due date'),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return "Please, select the due date";
-                                } else {
-                                  return null;
-                                }
-                              },
-                            ),
-                            Padding(
-                                padding: EdgeInsets.only(top: 15.0),
-                                child: RaisedButton(
-                                    color: Colors.lightBlueAccent,
-                                    onPressed: () {
-                                      if (_formKey.currentState.validate()) {
-                                        _addToDo();
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                    child: Text('Submit')))
-                          ])))));
+                                },
+                                decoration: InputDecoration(
+                                    hintText: 'Select the due date'),
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return "Please, select the due date";
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
+                              Padding(
+                                  padding: EdgeInsets.only(top: 15.0),
+                                  child: RaisedButton(
+                                      color: Colors.lightBlueAccent,
+                                      onPressed: () {
+                                        if (_formKey.currentState.validate()) {
+                                          setState(() {
+                                            ManipulatingData.addToDo(
+                                                titleController.text,
+                                                descController.text,
+                                                dateController.text);
+                                            Navigator.pop(context);
+                                          });
+                                        }
+                                      },
+                                      child: Text('Submit')))
+                            ]))))
+              ]);
         });
   }
 
@@ -148,26 +124,26 @@ class _HomeState extends State<Home> {
         centerTitle: true,
       ),
       body: ListView.builder(
-        itemCount: _toDoList.length,
+        itemCount: toDoList.length,
         itemBuilder: (context, index) {
           return CheckboxListTile(
-            title: Text(_toDoList[index]["title"]),
-            value: _toDoList[index]["ok"],
-            subtitle: Text(_toDoList[index]["desc"]),
+            title: Text(toDoList[index]["title"]),
+            value: toDoList[index]["ok"],
+            subtitle: Text(toDoList[index]["desc"]),
             secondary: Column(children: <Widget>[
-              Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
+              Icon(toDoList[index]["ok"] ? Icons.check : Icons.error),
               Text(
                 "Due date:",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
               ),
               Text(
-                _toDoList[index]["date"],
+                toDoList[index]["date"],
                 style: TextStyle(fontSize: 10.0),
               ),
             ]),
             onChanged: (bool value) {
               setState(() {
-                _toDoList[index]["ok"] = value;
+                toDoList[index]["ok"] = value;
               });
             },
           );
