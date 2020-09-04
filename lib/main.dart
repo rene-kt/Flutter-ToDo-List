@@ -18,11 +18,41 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List _toDoList = [];
   final _formKey = GlobalKey<FormState>();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descController = TextEditingController();
+
+  void _addToDo() {
+    setState(() {
+      Map<String, dynamic> newToDo = Map();
+      newToDo["title"] = titleController.text;
+      newToDo["desc"] = descController.text;
+      newToDo["ok"] = false;
+      _toDoList.add(newToDo);
+    });
+  }
+
+  Future<File> _getFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File("${directory.path}/data.json");
+  }
+
+  Future<File> _saveData() async {
+    String data = json.encode(_toDoList);
+    final file = await _getFile();
+    return file.writeAsString(data);
+  }
+
+  Future<String> _readData() async {
+    try {
+      final file = await _getFile();
+
+      return file.readAsString();
+    } catch (e) {
+      return "erro: " + e;
+    }
+  }
 
   _createAlertDialog(BuildContext context) {
-    TextEditingController titleController = TextEditingController();
-    TextEditingController descController = TextEditingController();
-
     return showDialog(
         context: context,
         builder: (context) {
@@ -66,9 +96,11 @@ class _HomeState extends State<Home> {
                             Padding(
                                 padding: EdgeInsets.only(top: 15.0),
                                 child: RaisedButton(
+                                    color: Colors.lightBlueAccent,
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
-                                        //ADD DATA
+                                        _addToDo();
+                                        Navigator.pop(context);
                                       }
                                     },
                                     child: Text('Submit')))
@@ -87,14 +119,19 @@ class _HomeState extends State<Home> {
       body: ListView.builder(
         itemCount: _toDoList.length,
         itemBuilder: (context, index) {
-          // return CheckboxListTile(
-          //   // title: Text(_toDoList[index]["title"]),
-          //   // value: _toDoList[index]["ok"],
-          //   secondary: CircleAvatar(
-          //     child: Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
-          //   ),
-          //   onChanged: (bool value) {},
-          // );
+          return CheckboxListTile(
+            title: Text(_toDoList[index]["title"]),
+            value: _toDoList[index]["ok"],
+            subtitle: Text(_toDoList[index]["desc"]),
+            secondary: CircleAvatar(
+              child: Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
+            ),
+            onChanged: (bool value) {
+              setState(() {
+                _toDoList[index]["ok"] = value;
+              });
+            },
+          );
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -106,29 +143,5 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.lightBlueAccent,
       ),
     );
-
-    void _addToDo() {}
-    // ignore: dead_code
-
-    Future<File> _getFile() async {
-      final directory = await getApplicationDocumentsDirectory();
-      return File("${directory.path}/data.json");
-    }
-
-    Future<File> _saveData() async {
-      String data = json.encode(_toDoList);
-      final file = await _getFile();
-      return file.writeAsString(data);
-    }
-
-    Future<String> _readData() async {
-      try {
-        final file = await _getFile();
-
-        return file.readAsString();
-      } catch (e) {
-        return "erro: " + e;
-      }
-    }
   }
 }
