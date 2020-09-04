@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -23,6 +23,8 @@ class _HomeState extends State<Home> {
   TextEditingController dateController = TextEditingController();
 
   DateTime _dateTime;
+
+  var format = new DateFormat("dd/MM/yyyy");
 
   void _addToDo() {
     setState(() {
@@ -108,8 +110,7 @@ class _HomeState extends State<Home> {
                                     .then((date) {
                                   setState(() {
                                     _dateTime = date;
-                                    dateController.text =
-                                        date.toString().substring(0, 10);
+                                    dateController.text = format.format(date);
                                   });
                                 });
                               },
@@ -155,7 +156,14 @@ class _HomeState extends State<Home> {
             subtitle: Text(_toDoList[index]["desc"]),
             secondary: Column(children: <Widget>[
               Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
-              Text(_toDoList[index]["date"]),
+              Text(
+                "Due date:",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+              ),
+              Text(
+                _toDoList[index]["date"],
+                style: TextStyle(fontSize: 10.0),
+              ),
             ]),
             onChanged: (bool value) {
               setState(() {
