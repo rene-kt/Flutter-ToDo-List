@@ -20,12 +20,16 @@ class _HomeState extends State<Home> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController titleController = TextEditingController();
   TextEditingController descController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+
+  DateTime _dateTime;
 
   void _addToDo() {
     setState(() {
       Map<String, dynamic> newToDo = Map();
       newToDo["title"] = titleController.text;
       newToDo["desc"] = descController.text;
+      newToDo["date"] = dateController.text;
       newToDo["ok"] = false;
       _toDoList.add(newToDo);
     });
@@ -62,7 +66,7 @@ class _HomeState extends State<Home> {
               content: Form(
                   key: _formKey,
                   child: Container(
-                      height: 170.0,
+                      height: 250.0,
                       child: Center(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -88,6 +92,32 @@ class _HomeState extends State<Home> {
                               validator: (value) {
                                 if (value.isEmpty) {
                                   return "Please, enter some text";
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                            TextFormField(
+                              controller: dateController,
+                              onTap: () {
+                                showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime(2022))
+                                    .then((date) {
+                                  setState(() {
+                                    _dateTime = date;
+                                    dateController.text =
+                                        date.toString().substring(0, 10);
+                                  });
+                                });
+                              },
+                              decoration: InputDecoration(
+                                  hintText: 'Select the due date'),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "Please, select the due date";
                                 } else {
                                   return null;
                                 }
@@ -123,9 +153,10 @@ class _HomeState extends State<Home> {
             title: Text(_toDoList[index]["title"]),
             value: _toDoList[index]["ok"],
             subtitle: Text(_toDoList[index]["desc"]),
-            secondary: CircleAvatar(
-              child: Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
-            ),
+            secondary: Column(children: <Widget>[
+              Icon(_toDoList[index]["ok"] ? Icons.check : Icons.error),
+              Text(_toDoList[index]["date"]),
+            ]),
             onChanged: (bool value) {
               setState(() {
                 _toDoList[index]["ok"] = value;
