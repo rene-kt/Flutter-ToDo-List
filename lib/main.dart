@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:FlutterToDoList/data/manipulating-data.dart';
+import 'package:FlutterToDoList/widgets/item-builder.widget.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -24,19 +25,8 @@ class _HomeState extends State<Home> {
 
   DateTime _dateTime;
 
-  List toDoList = ManipulatingData.toDoList;
   var format = new DateFormat("dd/MM/yyyy");
-
-  @override
-  void initState() {
-    super.initState();
-
-    ManipulatingData.readData().then((data) {
-      setState(() {
-        toDoList = json.decode(data);
-      });
-    });
-  }
+  List toDoList = ManipulatingData.toDoList;
 
   _createAlertDialog(BuildContext context) {
     return showDialog(
@@ -135,32 +125,10 @@ class _HomeState extends State<Home> {
         centerTitle: true,
       ),
       body: ListView.builder(
-        itemCount: toDoList.length,
-        itemBuilder: (context, index) {
-          return CheckboxListTile(
-            title: Text(toDoList[index]["title"]),
-            value: toDoList[index]["ok"],
-            subtitle: Text(toDoList[index]["desc"]),
-            secondary: Column(children: <Widget>[
-              Icon(toDoList[index]["ok"] ? Icons.check : Icons.error),
-              Text(
-                "Due date:",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
-              ),
-              Text(
-                toDoList[index]["date"],
-                style: TextStyle(fontSize: 10.0),
-              ),
-            ]),
-            onChanged: (bool value) {
-              setState(() {
-                toDoList[index]["ok"] = value;
-                ManipulatingData.saveData();
-              });
-            },
-          );
-        },
-      ),
+          itemCount: toDoList.length,
+          itemBuilder: (context, index) {
+            return ItemBuilder.buildItem(context, index);
+          }),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _createAlertDialog(context);
