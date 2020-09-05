@@ -6,18 +6,18 @@ import 'dart:convert';
 class ManipulatingData {
   static List toDoList = [];
 
-  Future<File> getFile() async {
+  static Future<File> getFile() async {
     final directory = await getApplicationDocumentsDirectory();
     return File("${directory.path}/data.json");
   }
 
-  Future<File> saveData() async {
+  static Future<File> saveData() async {
     String data = json.encode(toDoList);
     final file = await getFile();
     return file.writeAsString(data);
   }
 
-  Future<String> readData() async {
+  static Future<String> readData() async {
     try {
       final file = await getFile();
 
@@ -28,12 +28,12 @@ class ManipulatingData {
   }
 
   static void addToDo(String title, String desc, String date) {
-    print("ENTROU NO METODO");
     Map<String, dynamic> newToDo = Map();
     newToDo["title"] = title;
     newToDo["desc"] = desc;
     newToDo["date"] = date;
     newToDo["ok"] = false;
     toDoList.add(newToDo);
+    saveData();
   }
 }

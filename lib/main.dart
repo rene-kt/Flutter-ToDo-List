@@ -27,6 +27,17 @@ class _HomeState extends State<Home> {
   List toDoList = ManipulatingData.toDoList;
   var format = new DateFormat("dd/MM/yyyy");
 
+  @override
+  void initState() {
+    super.initState();
+
+    ManipulatingData.readData().then((data) {
+      setState(() {
+        toDoList = json.decode(data);
+      });
+    });
+  }
+
   _createAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
@@ -144,6 +155,7 @@ class _HomeState extends State<Home> {
             onChanged: (bool value) {
               setState(() {
                 toDoList[index]["ok"] = value;
+                ManipulatingData.saveData();
               });
             },
           );
