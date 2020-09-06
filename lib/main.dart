@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:FlutterToDoList/data/manipulating-data.dart';
 import 'package:FlutterToDoList/widgets/item-builder.widget.dart';
-import 'package:FlutterToDoList/widgets/alert-dialog.widget.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -12,23 +12,104 @@ void main() {
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
-
-  createAlertDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return ShowAlertDialog();
-        });
-  }
 }
 
 class _HomeState extends State<Home> {
   List toDoList = ManipulatingData.toDoList;
 
-  refreshingThePage(String title, String desc, String date) {
-    setState(() {
-      ManipulatingData.addToDo(title, desc, date);
-    });
+  var format = new DateFormat("dd/MM/yyyy");
+  DateTime dateTime;
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+
+  Widget createAlertDialog(context) {
+    return SimpleDialog(title: Text("Name your task"), children: <Widget>[
+      Form(
+          key: formKey,
+          child: Container(
+              height: 250.0,
+              width: 300.0,
+              child: Center(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                    TextFormField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type the title',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Please, enter some text";
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    TextFormField(
+                      controller: descController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type the description',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Please, enter some text";
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    TextFormField(
+                      controller: dateController,
+                      onTap: () {
+                        showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(2022))
+                            .then((date) {
+                          setState(() {
+                            dateTime = date;
+                            dateController.text = format.format(date);
+                          });
+                        });
+                      },
+                      decoration:
+                          InputDecoration(hintText: 'Select the due date'),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Please, select the due date";
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    Padding(
+                        padding: EdgeInsets.only(top: 15.0),
+                        child: RaisedButton(
+                            color: Colors.lightBlueAccent,
+                            onPressed: () {
+                              if (formKey.currentState.validate()) {
+                                setState(() {
+                                  ManipulatingData.addToDo(titleController.text,
+                                      descController.text, dateController.text);
+                                  Navigator.of(context).pop();
+                                });
+                              }
+                            },
+                            child: Text('Submit')))
+                  ]))))
+    ]);
+  }
+
+  showAlertDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return createAlertDialog(context);
+        });
   }
 
   @override
@@ -37,12 +118,11 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text("To-Do List"),
         backgroundColor: Colors.lightBlueAccent,
-        centerTitle: true,
       ),
       body: ItemBuilder(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          createAlertDialog(context);
+          showAlertDialog(context);
         },
         label: Text('Add'),
         icon: Icon(Icons.add),
