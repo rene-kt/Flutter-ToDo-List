@@ -1,6 +1,6 @@
+import 'package:FlutterToDoList/widgets/item-builder.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:FlutterToDoList/data/manipulating-data.dart';
-import 'package:FlutterToDoList/widgets/item-builder.widget.dart';
 import 'package:intl/intl.dart';
 
 void main() {
