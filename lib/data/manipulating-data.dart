@@ -5,6 +5,8 @@ import 'dart:convert';
 
 class ManipulatingData {
   static List toDoList = [];
+  static Map<String, dynamic> lastRemoved;
+  static int lastRemovedPosition;
 
   static Future<File> getFile() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -34,6 +36,13 @@ class ManipulatingData {
     newToDo["date"] = date;
     newToDo["ok"] = false;
     toDoList.add(newToDo);
+    saveData();
+  }
+
+  static void removingData(index) {
+    lastRemoved = Map.from(toDoList[index]);
+    lastRemovedPosition = index;
+    toDoList.removeAt(index);
     saveData();
   }
 }
