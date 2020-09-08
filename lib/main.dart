@@ -29,62 +29,71 @@ class _HomeState extends State<Home> {
       Form(
           key: formKey,
           child: Container(
-              height: 250.0,
-              width: 300.0,
+              height: 300.0,
+              width: 450.0,
               child: Center(
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                    TextFormField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type the title',
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: TextFormField(
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          hintText: 'Type the title',
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Please, enter some text";
+                          } else {
+                            return null;
+                          }
+                        },
                       ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Please, enter some text";
-                        } else {
-                          return null;
-                        }
-                      },
                     ),
-                    TextFormField(
-                      controller: descController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type the description',
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: TextFormField(
+                        controller: descController,
+                        decoration: const InputDecoration(
+                          hintText: 'Type the description',
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Please, enter some text";
+                          } else {
+                            return null;
+                          }
+                        },
                       ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Please, enter some text";
-                        } else {
-                          return null;
-                        }
-                      },
                     ),
-                    TextFormField(
-                      controller: dateController,
-                      onTap: () {
-                        showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(2022))
-                            .then((date) {
-                          setState(() {
-                            dateTime = date;
-                            dateController.text = format.format(date);
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: TextFormField(
+                        controller: dateController,
+                        onTap: () {
+                          showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(2022))
+                              .then((date) {
+                            setState(() {
+                              dateTime = date;
+                              dateController.text = format.format(date);
+                            });
                           });
-                        });
-                      },
-                      decoration:
-                          InputDecoration(hintText: 'Select the due date'),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Please, select the due date";
-                        } else {
-                          return null;
-                        }
-                      },
+                        },
+                        decoration:
+                            InputDecoration(hintText: 'Select the due date'),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Please, select the due date";
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
                     ),
                     Padding(
                         padding: EdgeInsets.only(top: 15.0),
@@ -96,6 +105,9 @@ class _HomeState extends State<Home> {
                                   ManipulatingData.addToDo(titleController.text,
                                       descController.text, dateController.text);
                                   Navigator.of(context).pop();
+                                  titleController.text = "";
+                                  descController.text = "";
+                                  dateController.text = "";
                                 });
                               }
                             },

@@ -7,12 +7,10 @@ class ItemBuilder extends StatefulWidget {
 }
 
 class _ItemBuilderState extends State<ItemBuilder> {
-  List toDoList = ManipulatingData.toDoList;
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        itemCount: toDoList.length,
+        itemCount: ManipulatingData.toDoList.length,
         itemBuilder: (context, index) {
           return Dismissible(
             background: Container(
