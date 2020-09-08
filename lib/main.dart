@@ -104,6 +104,12 @@ class _HomeState extends State<Home> {
     ]);
   }
 
+  Future<Null> refresh() async {
+    setState(() {
+      ManipulatingData.refresh();
+    });
+  }
+
   showAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
@@ -119,7 +125,7 @@ class _HomeState extends State<Home> {
         title: Text("To-Do List"),
         backgroundColor: Colors.lightBlueAccent,
       ),
-      body: ItemBuilder(),
+      body: RefreshIndicator(onRefresh: refresh, child: ItemBuilder()),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           showAlertDialog(context);

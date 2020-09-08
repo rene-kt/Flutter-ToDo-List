@@ -45,4 +45,18 @@ class ManipulatingData {
     toDoList.removeAt(index);
     saveData();
   }
+
+  static Future<Null> refresh() async {
+    await Future.delayed(Duration(seconds: 1));
+
+    toDoList.sort((a, b) {
+      if (a["ok"] && !b["ok"]) {
+        return 1;
+      } else if (!a["ok"] && b["ok"]) {
+        return -1;
+      }
+      return 0;
+    });
+    saveData();
+  }
 }
